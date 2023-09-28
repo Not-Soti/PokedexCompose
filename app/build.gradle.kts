@@ -90,8 +90,16 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.ktor:ktor-client-logging:$ktor_version")
 
+    //Ktor interceptor logger
+    implementation("org.slf4j:slf4j-simple:1.7.26")
 
+    //Paint async image
+    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
+
+    //Navigation
+    implementation("androidx.navigation:navigation-compose:2.5.3")
 }
 
 //Dagger hilt

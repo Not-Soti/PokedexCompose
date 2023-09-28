@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.pokemonList
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -34,6 +34,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import com.example.myapplication.PokemonDataViewModel
+import com.example.myapplication.network.PokemonModel
+import com.example.myapplication.R
+import com.example.myapplication.navigation.Navigation
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,7 +46,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val pokemonListViewModel by viewModels<PokemonListViewModel>()
+    private val pokemonDataViewModel by viewModels<PokemonDataViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +57,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(pokemonListViewModel)
+                    //PokemonListScreen(pokemonListViewModel)
+                    Navigation(pokemonDataViewModel)
                 }
             }
         }
@@ -60,10 +66,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(pokemonListViewModel : PokemonListViewModel, modifier: Modifier = Modifier) {
-    val pokemonList by pokemonListViewModel.pokemonList.collectAsState()
+fun PokemonListScreen(pokemonDataViewModel : PokemonDataViewModel, modifier: Modifier = Modifier) {
+    val pokemonList by pokemonDataViewModel.pokemonList.collectAsState()
     Column {
-        Button(onClick = { pokemonListViewModel.addNewPokemon() }) {
+        Button(onClick = { pokemonDataViewModel.addNewPokemon() }) {
             Text(text = "Add new pokemon")
         }
         LazyColumn {
@@ -82,7 +88,7 @@ fun PokemonCard(pokemon: PokemonModel){
             .padding(2.dp)
             .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp))) {//Card
             Image(
-                painterResource(R.drawable.ic_launcher_foreground),
+                painter = rememberAsyncImagePainter(pokemon.sprites?.other?.official_artwork?.front_default.toString()),
                 contentDescription = "Image",
                 modifier = Modifier.size(128.dp))
 
