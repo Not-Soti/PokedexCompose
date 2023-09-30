@@ -10,13 +10,7 @@ class Repository @Inject constructor(val ktorClient : HttpClient) {
 
     private val baseUrl = "https://pokeapi.co/api/v2/"
 
-    fun getPokemonList(): MutableList<PokemonModel> {
-        return mutableListOf(
-
-        )
-    }
-
-    suspend fun getNewPokemon(pokemonName : String): PokemonModel {
+    suspend fun getNewPokemon(pokemonName: Int): PokemonModel {
         println("Repository - getNewPokemon - Enter")
         kotlin.runCatching { ktorClient.get("${baseUrl}/pokemon/$pokemonName/") }
             .onSuccess {
