@@ -1,11 +1,17 @@
 package com.example.myapplication.network
 
+import com.example.myapplication.pokemonList.PokemonItemDao
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PokemonModel (var name : String = "", var imageUrl : String = "", var sprites: SpritesModel? = null){
-
+data class PokemonItemDto (@SerialName("name")var name : String = "",
+                           @SerialName("id")var id : Int,
+                           @SerialName("sprites")var sprites: SpritesModel? = null,
+){
+    fun toPokemonItemDao() : PokemonItemDao{
+        return PokemonItemDao(id, name, sprites?.other?.official_artwork?.front_default.toString())
+    }
 }
 
 @Serializable

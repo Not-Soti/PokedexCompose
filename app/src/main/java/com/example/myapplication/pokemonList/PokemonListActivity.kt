@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,7 +30,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.PokemonDataViewModel
 import com.example.myapplication.R
-import com.example.myapplication.network.PokemonModel
+import com.example.myapplication.network.PokemonItemDto
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 
@@ -37,17 +38,17 @@ private val logTag = "PokemonListActivity"
 
 @Composable
 fun PokemonListScreen(navController: NavHostController, pokemonDataViewModel: PokemonDataViewModel) {
-    val pokemonList = pokemonDataViewModel.pokemonList
+    val pokemonList = pokemonDataViewModel.pokemonList.collectAsState()
     Log.d(logTag, "PokemonListScreen()")
     LazyColumn {
-        items(pokemonList) { pokemon ->
+        items(pokemonList.value.sortedBy { it.id }) { pokemon ->
             PokemonCard(pokemon)
         }
     }
 }
 
 @Composable
-fun PokemonCard(pokemon: PokemonModel){
+fun PokemonCard(pokemon: PokemonItemDao){
     Log.d(logTag, "PokemonCard(${pokemon.name})")
         Row(modifier = Modifier
             .wrapContentHeight()
@@ -55,7 +56,7 @@ fun PokemonCard(pokemon: PokemonModel){
             .padding(2.dp)
             .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp))) {//Card
             Image(
-                painter = rememberAsyncImagePainter(pokemon.sprites?.other?.official_artwork?.front_default.toString()),
+                painter = rememberAsyncImagePainter(pokemon.mainImageUrl),
                 contentDescription = "Image",
                 modifier = Modifier.size(128.dp))
 
@@ -81,7 +82,7 @@ fun PokemonCard(pokemon: PokemonModel){
 }
 
 @Composable
-fun PokemonData(pokemon: PokemonModel, modifier: Modifier = Modifier) {
+fun PokemonData(pokemon: PokemonItemDao, modifier: Modifier = Modifier) {
     Column(verticalArrangement = Arrangement.Center, modifier = modifier){
         Text(text = pokemon.name, modifier = Modifier.padding(8.dp))
         Text(text = "N. ",
@@ -121,6 +122,6 @@ fun PokemonTypes(modifier : Modifier = Modifier){
 @Composable
 fun GreetingPreview() {
     MyApplicationTheme {
-        PokemonCard(pokemon = PokemonModel("Rayquaza", ""))
+        PokemonCard(pokemon = PokemonItemDao(1, "Rayquaza", ""))
     }
 }

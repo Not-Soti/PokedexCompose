@@ -3,7 +3,8 @@ package com.example.myapplication
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.network.PokemonModel
+import com.example.myapplication.Repository.Repository
+import com.example.myapplication.pokemonList.PokemonItemDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,9 +18,11 @@ class PokemonDataViewModel @Inject constructor(val repository : Repository) : Vi
 
     private val logTag = "PokemonDataViewModel"
 
-//    private var pokemonList_ : MutableStateFlow<List<PokemonModel>> = MutableStateFlow(emptyList())
-//    val pokemonList = pokemonList_.asStateFlow()
-    val pokemonList = mutableListOf<PokemonModel>()
+    private var pokemonList_ : MutableStateFlow<List<PokemonItemDao>> = MutableStateFlow(emptyList())
+    val pokemonList = pokemonList_.asStateFlow()
+
+    //Needed to share the number of items in the list as
+    // pokemonList_.asStateFlow() does not have a .size() value
     private var pokemonListSize_ : MutableStateFlow<Int> = MutableStateFlow(0)
     val pokemonListSize = pokemonListSize_.asStateFlow()
 
@@ -38,20 +41,20 @@ class PokemonDataViewModel @Inject constructor(val repository : Repository) : Vi
 
      fun loadPokemon(){
          Log.d(logTag, "loadPokemon - Enter")
-         viewModelScope.launch {
-             Log.d(logTag, "loadPokemon - launch")
-             for (pokeId in 1..30){
-                 val pokemon = withContext(Dispatchers.IO) { repository.getNewPokemon(pokeId) }
-                 pokemonList.add(pokemon)
-                 pokemonListSize_.value++
-                 Log.d(logTag, "loadPokemon pokemon added")
-             }
 
-             if(pokemonList.size == 30){
-                 Log.d(logTag, "loadPokemon state loaded")
-                 state_.value = State.Loaded
+         for (pokeId in 1..30){
+             viewModelScope.launch {
+                 Log.d(logTag, "loadPokemon - getting pokemon $pokeId")
+                 val pokemon = withContext(Dispatchers.IO) { repository.getNewPokemon(pokeId) }
+                 pokemonList_.value = pokemonList_.value + pokemon
+                 pokemonListSize_.value++
+                 if(pokemonList_.value.size == 30){
+                     state_.value = State.Loaded
+                 }
+                 Log.d(logTag, "loadPokemon pokemon $pokeId added")
              }
          }
+
     }
 
 }
